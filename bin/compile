@@ -66,8 +66,14 @@ fi
 BUILD_CACHE_LOCATION=${CACHE_DIR}/build/
 mkdir -p ${BUILD_CACHE_LOCATION}
 
+
 echo "nuget restore"
+# TODO: figure out why this command errors with this:
+    # Access to the path "/nonexistent" is denied."
 #mono ${NUGET_EXECUTABLE_PATH} restore -NonInteractive
+
+
+
 echo "xbuild"
 xbuild /property:Configuration=Release /property:OutDir=${BUILD_CACHE_LOCATION} ${SLN}
 echo "cp from build cache location"
