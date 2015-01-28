@@ -53,31 +53,36 @@ export PATH="/app/mono/bin:${PATH}"
 export LD_LIBRARY_PATH="/app/mono/lib:${LD_LIBRARY_PATH}"
 
 # Add certs to trust store
+echo "copying certs"
 cp -r ${LP_DIR}/.config ~/.
 cp -r ${LP_DIR}/.config ${BUILD_DIR}/.
 
 NUGET_EXECUTABLE_PATH=${CACHE_DIR}/nuget.exe
 if [ ! -f ${NUGET_EXECUTABLE_PATH} ]; then
+  echo "curling nuget"
   curl -LSso ${NUGET_EXECUTABLE_PATH} http://nuget.org/nuget.exe
 fi
 
 BUILD_CACHE_LOCATION=${CACHE_DIR}/build/
 mkdir -p ${BUILD_CACHE_LOCATION}
 
+echo "nuget restore"
 mono ${NUGET_EXECUTABLE_PATH} restore -NonInteractive
+echo "xbuild"
 xbuild /property:Configuration=Release /property:OutDir=${BUILD_CACHE_LOCATION} ${SLN}
-
+echo "cp from build cache location"
 cp -r ${BUILD_CACHE_LOCATION}* ${BUILD_DIR}
-
+echo "profile.d"
 mkdir -p ${BUILD_DIR}/.profile.d
 cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
 if [ -d "$BUILD_DIR/_PublishedWebsites/" ]; then
+  echo "xsp"
   XSP_CACHE_LOCATION=${CACHE_DIR}/${STACK}/xsp-${XSP_VERSION}
   conditional_download ${DEPENDENCY_S3_BUCKET_PATH}/${STACK}/xsp-${XSP_VERSION}.tar.gz ${XSP_CACHE_LOCATION}
   cp -r ${XSP_CACHE_LOCATION}/xsp .
   cp -r ${XSP_CACHE_LOCATION}/xsp/lib/mono/gac/* ./mono/lib/mono/gac/
-
+  echo "nginx"
   NGINX_CACHE_PATH=${CACHE_DIR}/${STACK}/nginx
   conditional_download ${DEPENDENCY_S3_BUCKET_PATH}/${STACK}/nginx.tar.gz ${NGINX_CACHE_PATH}
 
