@@ -67,7 +67,7 @@ BUILD_CACHE_LOCATION=${CACHE_DIR}/build/
 mkdir -p ${BUILD_CACHE_LOCATION}
 
 echo "nuget restore"
-mono ${NUGET_EXECUTABLE_PATH} restore -NonInteractive
+#mono ${NUGET_EXECUTABLE_PATH} restore -NonInteractive
 echo "xbuild"
 xbuild /property:Configuration=Release /property:OutDir=${BUILD_CACHE_LOCATION} ${SLN}
 echo "cp from build cache location"
